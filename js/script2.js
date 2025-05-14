@@ -124,11 +124,11 @@ const labelValueEl = document.getElementById("labelValue");
 const labelFromEl  = document.getElementById("labelFrom");
 const labelToEl    = document.getElementById("labelTo");
 
-// 4a. Load saved language preference
+// 5. Load saved language preference
 const savedLang = localStorage.getItem("jomiMapLang") || "en";
 langSwitch.value = savedLang;
 
-// 5. Render dropdowns according to current language
+// 6. Render dropdowns according to current language
 function populateDropdowns() {
   const dict = langSwitch.value === "bn" ? unitNamesBn : unitNamesEn;
   [fromUnit, toUnit].forEach(sel => {
@@ -142,7 +142,7 @@ function populateDropdowns() {
   toUnit.value   = "Decimal";
 }
 
-// 6. Swap labels when language changes
+// 7. Swap labels when language changes
 function updateLabels() {
   const L = labels[langSwitch.value];
   titleEl.textContent = L.title;
@@ -163,7 +163,7 @@ function updateLabels() {
 }
 
 
-// 7. Conversion logic unchanged
+// 8. Conversion logic unchanged
 function convert() {
   const val = parseFloat(inputValue.value);
   if (isNaN(val) || val < 0) {
@@ -189,7 +189,7 @@ function convert() {
 }
 
 
-// 8. Wire everything up
+// 9. Wire everything up
 langSwitch.addEventListener("change", () => {
   localStorage.setItem("jomiMapLang", langSwitch.value);
 
@@ -198,11 +198,12 @@ langSwitch.addEventListener("change", () => {
   convert();
 });
 
-// 9. Initial render
+// 10. Initial render
 updateLabels();
 populateDropdowns();
 convert();
 
+// 11. Event listeners
 fromUnit.addEventListener("change", convert);
 toUnit.addEventListener("change", convert);
 inputValue.addEventListener("input", convert);
@@ -210,8 +211,3 @@ document.getElementById("swapButton").addEventListener("click", () => {
   [fromUnit.value, toUnit.value] = [toUnit.value, fromUnit.value];
   convert();
 });
-
-// 9. Initial render
-updateLabels();
-populateDropdowns();
-convert();
