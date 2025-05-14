@@ -7,8 +7,8 @@ function toBengaliDigits(str) {
 // 1. Conversion Logic
 const conversionMap = {
   // Base: 1 Decimal (Shotangsho)
-  Decimal:    1,               // 1 Decimal = 1 Shotangsho
-  Shotok:     1,             
+  Decimal:    1,               
+  Shotok:     1,               // 1 Decimal = 1 Shotangsho/Shotok
   Ojutangsho: 0.01,            // 1 Shotok = 100 Ojutangsho
 
   // Traditional units
@@ -29,7 +29,7 @@ const conversionMap = {
   // Square‑foot‑based units
   SqFeet:  1 / 435.6,          // 1 Shotok = 435.6 sq ft
   SqYard:  1 / 48.4,           // 1 Shotok = 435.6 sq ft ÷9 = 48.4 sq yd
-  Bargogaz: 1 / 48.4,          // exact same as SqYard
+  // Bargogaz: 1 / 48.4,          // exact same as SqYard
 
   SqMeter: 1 / 40.46856,       // 1 Shotok = 435.6 sq ft ÷10.7639 = 40.46856 m²
 
@@ -59,35 +59,33 @@ const unitNamesEn = {
   Ayer: "Ayer",
   SqFeet: "Square Feet",
   SqMeter: "Square Meter",
-  SqYard: "Square Yard",
-  Bargogaz: "Bargo Gaz",
+  SqYard: "Square Yard/Bargo Gaz",
   Bargohat: "Bargo Hat",
   Bargolink: "Bargo Link",
   Link: "Link",
-  SqChain: "Square Chain"
+  SqChain: "Bargo Chain"
 };
 
 const unitNamesBn = {
   Decimal: "দশমিক/ডিসিম/ডিসমিল",
   Shotok: "শতক/শতাংশ",
-  Ojutangsho: "ওজুতঙ্গশ",
+  Ojutangsho: "ওজুতাংশ",
   Katha: "কাঠা",
-  Chotak: "চোটক",
+  Chotak: "ছটাক",
   Bigha: "বিঘা",
   Kani: "কানি",
-  Gonda: "গোন্ডা",
-  Kora: "কোড়া",
-  Kranti: "করণের্টি",
-  Til: "টিল",
+  Gonda: "গন্ডা",
+  Kora: "কড়া",
+  Kranti: "কান্তি",
+  Til: "তিল",
   Acre: "একর",
   Hectare: "হেক্টর",
-  Ayer: "আয়ার",
+  Ayer: "আইর",
   SqFeet: "বর্গফুট",
   SqMeter: "বর্গমিটার",
   SqYard: "বর্গগজ",
-  Bargogaz: "বরগোগাজ",
-  Bargohat: "বরগোহাট",
-  Bargolink: "বরগোলিঙ্ক",
+  Bargohat: "বর্গহাট",
+  Bargolink: "বর্গলিঙ্ক",
   Link: "লিঙ্ক",
   SqChain: "বর্গচেইন"
 };
@@ -95,18 +93,20 @@ const unitNamesBn = {
 // 3. Label translations
 const labels = {
   en: {
-    title: "JomiMap",
+    documentTitle: "Jomi Mapo – Bangladesh Land Measurement Converter",
+    title: "Jomi Mapo",
     tagline: "Bangladesh Land Measurement Converter",
     labelValue: "Enter Value",
     labelFrom: "From Unit",
     labelTo: "To Unit"
   },
   bn: {
+    documentTitle: "জমি মাপ - বাংলাদেশের ভূমি/জমি মাপার কনভার্টার",
     title: "জমি মাপ",
-    tagline: "বাংলাদেশ জমির পরিমাপ রূপান্তরক",
+    tagline: "বাংলাদেশের ভূমি/জমি মাপার কনভার্টার",
     labelValue: "মান লিখুন",
-    labelFrom: "থেকে ইউনিট",
-    labelTo: "যেতে ইউনিট"
+    labelFrom: "যে একক থেকে",
+    labelTo: "যে এককে"
   }
 };
 
@@ -138,13 +138,14 @@ function populateDropdowns() {
     }
   });
   // keep defaults
-  fromUnit.value = "Bigha";
+  fromUnit.value = "Shotok";
   toUnit.value   = "Decimal";
 }
 
 // 7. Swap labels when language changes
 function updateLabels() {
   const L = labels[langSwitch.value];
+  document.title = L.documentTitle;
   titleEl.textContent = L.title;
   taglineEl.textContent    = L.tagline;
   labelValueEl.textContent = L.labelValue;
@@ -158,18 +159,18 @@ function updateLabels() {
 
   // update swap tooltip
   document.getElementById("swapButton").title = langSwitch.value === "bn"
-    ? "ইউনিট পাল্টান"
+    ? "ইউনিট অদলবদল করুন"
     : "Swap Units";
 }
 
 
-// 8. Conversion logic unchanged
+// 8. Conversion logic
 function convert() {
   const val = parseFloat(inputValue.value);
   if (isNaN(val) || val < 0) {
-    return result.textContent = langSwitch.value === "bn"
+    return result.innerHTML = langSwitch.value === "bn"
       ? toBengaliDigits("0")
-      : "0";
+      : "0 ";
   }
 
   const from = fromUnit.value, to = toUnit.value;
@@ -178,14 +179,14 @@ function convert() {
 
   // pick unit label
   const nameDict = langSwitch.value === "bn" ? unitNamesBn : unitNamesEn;
-  let display = `${converted.toFixed(6)} ${nameDict[to]}`;
+  let display = `<strong>${converted.toFixed(6)}</strong><br>${nameDict[to]}`;
 
   // convert digits if Bengali
   if (langSwitch.value === "bn") {
     display = toBengaliDigits(display);
   }
 
-  result.textContent = display;
+  result.innerHTML = display;
 }
 
 

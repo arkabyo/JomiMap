@@ -7,13 +7,12 @@ body {
 
 body {
 	background: linear-gradient(to right, #fde2d7, #f1f8ff);
-	font-family: "Segoe UI", sans-serif;
+	font-family: "Noto Sans Bengali", "Segoe UI", sans-serif;
 	min-height: 100vh;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	padding: 1.5rem;
-	/* ensures margin from edges */
 	box-sizing: border-box;
 }
 
@@ -26,7 +25,6 @@ body {
 	max-width: 640px;
 	max-height: 100%;
 	overflow: auto;
-	/* fallback if needed */
 }
 
 .logo-img {
@@ -80,8 +78,13 @@ label {
 	border-radius: 8px;
 	text-align: center;
 	font-size: 1.4rem;
-	font-weight: 600;
 	color: #01579b;
+	white-space: pre-wrap; /* Add this line */
+
+}
+
+strong{
+	font-weight: 700;
 }
 
 @media (max-width: 576px) {
