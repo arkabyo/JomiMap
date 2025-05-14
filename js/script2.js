@@ -1,0 +1,217 @@
+// 0. Map Western digits → Bengali digits
+const bnDigits = ["০","১","২","৩","৪","৫","৬","৭","৮","৯"];
+function toBengaliDigits(str) {
+  return str.replace(/\d/g, d => bnDigits[+d]);
+}
+
+// 1. Conversion Logic
+const conversionMap = {
+  // Base: 1 Decimal (Shotangsho)
+  Decimal:    1,               // 1 Decimal = 1 Shotangsho
+  Shotok:     1,             
+  Ojutangsho: 0.01,            // 1 Shotok = 100 Ojutangsho
+
+  // Traditional units
+  Katha: 1.65,                 // 1.65 Shotok
+  Chotak: 1.65 / 16,           // 1/16 of a Katha
+  Bigha: 33,                   // 33 Shotok
+  Kani: 120,                   // 120 Shotok
+  Gonda: 6,                    // 20 Gonda = 1 Kani → 120/20 = 6
+  Kora: 1.5,                   // 4 Kora = 1 Gonda → 6/4 = 1.5
+  Kranti: 0.5,                 // 3 Kranti = 1 Kora → 1.5/3 = 0.5
+  Til: 0.025,                  // 20 Til = 1 Kranti → 0.5/20 = 0.025
+
+  // Acre & hectare
+  Acre:    100,                // 3 Bigha ≈ 1 Acre → 3×33 = 99 ≈100
+  Hectare: 247.105,            // 1 Ha = 100 Ayer = 247.105 Shotok
+  Ayer:    2.47105,            // 1 Ayer = 1/100 Ha
+
+  // Square‑foot‑based units
+  SqFeet:  1 / 435.6,          // 1 Shotok = 435.6 sq ft
+  SqYard:  1 / 48.4,           // 1 Shotok = 435.6 sq ft ÷9 = 48.4 sq yd
+  Bargogaz: 1 / 48.4,          // exact same as SqYard
+
+  SqMeter: 1 / 40.46856,       // 1 Shotok = 435.6 sq ft ÷10.7639 = 40.46856 m²
+
+  Bargohat: 1 / 193.6,         // 1 Shotok = 193.6 sq hat (8‑hat nol)
+  Bargolink: 1 / 1000,         // 1 Shotok = 1000 sq link
+  Link:      1 / 1000,         // alias
+
+  // Square chain
+  SqChain:  10                 // 1 sq chain = 66×66 ft = 4356 sq ft = 10 Shotok
+};
+
+// 2. Two parallel unit-name dictionaries
+const unitNamesEn = {
+  Decimal: "Decimal/Dishim/Dismil",
+  Shotok: "Shotok/Shotangsho",
+  Ojutangsho: "Ojutangsho",
+  Katha: "Katha",
+  Chotak: "Chotak",
+  Bigha: "Bigha",
+  Kani: "Kani",
+  Gonda: "Gonda",
+  Kora: "Kora",
+  Kranti: "Kranti",
+  Til: "Til",
+  Acre: "Acre",
+  Hectare: "Hectare",
+  Ayer: "Ayer",
+  SqFeet: "Square Feet",
+  SqMeter: "Square Meter",
+  SqYard: "Square Yard",
+  Bargogaz: "Bargo Gaz",
+  Bargohat: "Bargo Hat",
+  Bargolink: "Bargo Link",
+  Link: "Link",
+  SqChain: "Square Chain"
+};
+
+const unitNamesBn = {
+  Decimal: "দশমিক/ডিসিম/ডিসমিল",
+  Shotok: "শতক/শতাংশ",
+  Ojutangsho: "ওজুতঙ্গশ",
+  Katha: "কাঠা",
+  Chotak: "চোটক",
+  Bigha: "বিঘা",
+  Kani: "কানি",
+  Gonda: "গোন্ডা",
+  Kora: "কোড়া",
+  Kranti: "করণের্টি",
+  Til: "টিল",
+  Acre: "একর",
+  Hectare: "হেক্টর",
+  Ayer: "আয়ার",
+  SqFeet: "বর্গফুট",
+  SqMeter: "বর্গমিটার",
+  SqYard: "বর্গগজ",
+  Bargogaz: "বরগোগাজ",
+  Bargohat: "বরগোহাট",
+  Bargolink: "বরগোলিঙ্ক",
+  Link: "লিঙ্ক",
+  SqChain: "বর্গচেইন"
+};
+
+// 3. Label translations
+const labels = {
+  en: {
+    title: "JomiMap",
+    tagline: "Bangladesh Land Measurement Converter",
+    labelValue: "Enter Value",
+    labelFrom: "From Unit",
+    labelTo: "To Unit"
+  },
+  bn: {
+    title: "জমি মাপ",
+    tagline: "বাংলাদেশ জমির পরিমাপ রূপান্তরক",
+    labelValue: "মান লিখুন",
+    labelFrom: "থেকে ইউনিট",
+    labelTo: "যেতে ইউনিট"
+  }
+};
+
+// 4. Grab DOM elements
+const langSwitch = document.getElementById("langSwitch");
+const fromUnit = document.getElementById("fromUnit");
+const toUnit   = document.getElementById("toUnit");
+const inputValue = document.getElementById("inputValue");
+const result = document.getElementById("result");
+
+// labels
+const titleEl = document.querySelector(".app-title");
+const taglineEl = document.getElementById("tagline");
+const labelValueEl = document.getElementById("labelValue");
+const labelFromEl  = document.getElementById("labelFrom");
+const labelToEl    = document.getElementById("labelTo");
+
+// 4a. Load saved language preference
+const savedLang = localStorage.getItem("jomiMapLang") || "en";
+langSwitch.value = savedLang;
+
+// 5. Render dropdowns according to current language
+function populateDropdowns() {
+  const dict = langSwitch.value === "bn" ? unitNamesBn : unitNamesEn;
+  [fromUnit, toUnit].forEach(sel => {
+    sel.innerHTML = "";            // clear old
+    for (let key in dict) {
+      sel.add(new Option(dict[key], key));
+    }
+  });
+  // keep defaults
+  fromUnit.value = "Bigha";
+  toUnit.value   = "Decimal";
+}
+
+// 6. Swap labels when language changes
+function updateLabels() {
+  const L = labels[langSwitch.value];
+  titleEl.textContent = L.title;
+  taglineEl.textContent    = L.tagline;
+  labelValueEl.textContent = L.labelValue;
+  labelFromEl.textContent  = L.labelFrom;
+  labelToEl.textContent    = L.labelTo;
+
+  // update input placeholder
+  inputValue.placeholder = langSwitch.value === "bn"
+    ? toBengaliDigits("উদাহরণ: 2.5")
+    : "e.g., 2.5";
+
+  // update swap tooltip
+  document.getElementById("swapButton").title = langSwitch.value === "bn"
+    ? "ইউনিট পাল্টান"
+    : "Swap Units";
+}
+
+
+// 7. Conversion logic unchanged
+function convert() {
+  const val = parseFloat(inputValue.value);
+  if (isNaN(val) || val < 0) {
+    return result.textContent = langSwitch.value === "bn"
+      ? toBengaliDigits("0")
+      : "0";
+  }
+
+  const from = fromUnit.value, to = toUnit.value;
+  const base = val * conversionMap[from];
+  const converted = base / conversionMap[to];
+
+  // pick unit label
+  const nameDict = langSwitch.value === "bn" ? unitNamesBn : unitNamesEn;
+  let display = `${converted.toFixed(6)} ${nameDict[to]}`;
+
+  // convert digits if Bengali
+  if (langSwitch.value === "bn") {
+    display = toBengaliDigits(display);
+  }
+
+  result.textContent = display;
+}
+
+
+// 8. Wire everything up
+langSwitch.addEventListener("change", () => {
+  localStorage.setItem("jomiMapLang", langSwitch.value);
+
+  updateLabels();
+  populateDropdowns();
+  convert();
+});
+
+// 9. Initial render
+updateLabels();
+populateDropdowns();
+convert();
+
+fromUnit.addEventListener("change", convert);
+toUnit.addEventListener("change", convert);
+inputValue.addEventListener("input", convert);
+document.getElementById("swapButton").addEventListener("click", () => {
+  [fromUnit.value, toUnit.value] = [toUnit.value, fromUnit.value];
+  convert();
+});
+
+// 9. Initial render
+updateLabels();
+populateDropdowns();
+convert();
