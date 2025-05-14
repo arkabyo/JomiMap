@@ -1,6 +1,6 @@
-# JomiMap
+# JomiMapo
 
-**JomiMap** is a **frontend-only**, ultra-responsive web app for converting Bangladeshi land measurements between all traditional units (Bigha, Katha, Decimal, Shotok, etc.) and standard SI/Imperial units (Square Feet, Square Meter, Acre, Hectare).
+**Jomi Mapo** is a **frontend-only**, ultra-responsive web app for converting Bangladeshi land measurements between all traditional units (Bigha, Katha, Decimal, Shotok, etc.) and standard SI/Imperial units (Square Feet, Square Meter, Acre, Hectare).
 
 ![JomiMap Screenshot](images/screenshot.png)
 

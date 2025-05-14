@@ -154,7 +154,7 @@ function updateLabels() {
 
   // update input placeholder
   inputValue.placeholder = langSwitch.value === "bn"
-    ? toBengaliDigits("উদাহরণ: 2.5")
+    ? toBengaliDigits("অনুগ্রহ করে ইংরেজী সংখ্যায় লিখুন")
     : "e.g., 2.5";
 
   // update swap tooltip
@@ -170,7 +170,7 @@ function convert() {
   if (isNaN(val) || val < 0) {
     return result.innerHTML = langSwitch.value === "bn"
       ? toBengaliDigits("0")
-      : "0 ";
+      : "0";
   }
 
   const from = fromUnit.value, to = toUnit.value;
@@ -212,3 +212,5 @@ document.getElementById("swapButton").addEventListener("click", () => {
   [fromUnit.value, toUnit.value] = [toUnit.value, fromUnit.value];
   convert();
 });
+
+inputValue.focus();
