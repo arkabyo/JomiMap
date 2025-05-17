@@ -1,0 +1,21 @@
+{
+  "name": "Jomi Mapo",
+  "short_name": "জমি মাপ",
+  "description": "বাংলাদেশের ভূমি/জমি মাপার কনভার্টার",
+  "start_url": "/JomiMap/index.html",
+  "display": "standalone",
+  "background_color": "#fde2d7",
+  "theme_color": "#0077b6",
+  "icons": [
+    {
+      "src": "/JomiMap/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/JomiMap/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
