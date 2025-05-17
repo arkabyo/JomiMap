@@ -1,4 +1,3 @@
-// sw.js
 const CACHE_NAME = "jomimap-v1";
 const ASSETS = [
   "index.html",
@@ -20,8 +19,7 @@ self.addEventListener("install", evt => {
 
 self.addEventListener("fetch", evt => {
   evt.respondWith(
-    caches.match(evt.request).then(cached => {
-      return cached || fetch(evt.request);
-    })
+    caches.match(evt.request)
+      .then(cached => cached || fetch(evt.request))
   );
 });
