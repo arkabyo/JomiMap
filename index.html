@@ -68,12 +68,13 @@
 
         <script src="js/script2.js"></script>
         <script>
-            if ("serviceWorker" in navigator) {
-                navigator.serviceWorker.register("sw.js")
-                .then(() => console.log("Service Worker registered"))
-                .catch(console.error);
-            }
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("sw.js")
+            .then(() => console.log("SW registered"))
+            .catch(err => console.error("SW registration failed:", err));
+        }
         </script>
+
 
         </body>
 
